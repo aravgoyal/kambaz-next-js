@@ -24,7 +24,7 @@ export default function Dashboard() {
                 <div>
                     <h5> CS5678 MERN </h5>
                     <p className="wd-dashboard-course-title">
-                        Full Stack software developer
+                        Arav Goyal
                     </p>
                     <button> Go </button>
                 </div>
