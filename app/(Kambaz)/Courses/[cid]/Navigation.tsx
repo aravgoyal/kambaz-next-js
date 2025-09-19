@@ -5,8 +5,8 @@ export default function CourseNavigation() {
       <Link href="/Courses/1234/Home" id="wd-course-home-link">Home</Link><br/>
       <Link href="/Courses/1234/Modules" id="wd-course-modules-link">Modules
         </Link><br/>
-      <Link href="/Courses/1234/Piazza" id="wd-course-piazza-link">Piazza</Link><br/>
-      <Link href="/Courses/1234/Zoom" id="wd-course-zoom-link">Zoom</Link><br/>
+      <Link href="https://piazza.com/class/mf1li76n4is6m" id="wd-course-piazza-link">Piazza</Link><br/>
+      <Link href="https://northeastern.instructure.com/courses/225902/external_tools/35048" id="wd-course-zoom-link">Zoom</Link><br/>
       <Link href="/Courses/1234/Assignments" id="wd-course-assignments-link">
           Assignments</Link><br/>
       <Link href="/Courses/1234/Quizzes" id="wd-course-quizzes-link">Quizzes
