@@ -53,11 +53,11 @@ export default function AssignmentEditor() {
             <p>Assign Assign to</p>
             <textarea name="assign" id="wd-assign-to">Everyone</textarea>
             <p>Due</p>
-            <input type="datetime-local" id="wd-due-date" />
+            <input type="datetime-local" id="wd-due-date" defaultValue="2025-09-25T17:00" />
             <p>Available from</p>
-            <input type="datetime-local" id="wd-available-from" />
+            <input type="datetime-local" id="wd-available-from" defaultValue="2025-09-25T17:00" />
             <p>Until</p>
-            <input type="datetime-local" id="wd-available-until" />
+            <input type="datetime-local" id="wd-available-until" defaultValue="2025-09-25T17:00" />
         </td>
         </tr>
       </table>
