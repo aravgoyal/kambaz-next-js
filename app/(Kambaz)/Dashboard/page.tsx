@@ -20,7 +20,7 @@ export default function Dashboard() {
         </div>
         <div className="wd-dashboard-course">
             <Link href="/Courses/5678" className="wd-dashboard-course-link">
-                <Image src="/images/mern.jpg" width={200} height={150} alt={""} />
+                <Image src="/images/mern.jpeg" width={200} height={150} alt={""} />
                 <div>
                     <h5> CS5678 MERN </h5>
                     <p className="wd-dashboard-course-title">
