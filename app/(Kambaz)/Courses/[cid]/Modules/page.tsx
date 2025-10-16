@@ -1,7 +1,10 @@
+"use client";
 import { ListGroup, ListGroupItem } from "react-bootstrap";
 import ModulesControls from "./ModulesControls";
 import { BsGripVertical } from "react-icons/bs";
 import LessonControlButtons from "./LessonControlButtons";
+import { useParams } from "next/navigation";
+import * as db from "../../../Database";
 
 export default function Modules() {
   return (

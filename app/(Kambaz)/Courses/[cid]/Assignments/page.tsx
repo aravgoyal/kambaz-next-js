@@ -1,10 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { FaPlus, FaSearch } from "react-icons/fa";
+import * as db from "../../../Database";
 
-export default function Assignments() {
+interface Assignment {
+  _id: string;
+  title: string;
+  course: string;
+}
+
+interface AssignmentsProps {
+  courseId: string;
+}
+
+export default function Assignments({ courseId }: AssignmentsProps) {
+  const [search, setSearch] = useState("");
+
+  const assignments: Assignment[] = db.assignments.filter(
+    (a: { course: string; title: string; }) => a.course === courseId && a.title.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div id="wd-assignments" className="p-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -23,38 +41,28 @@ export default function Assignments() {
         <InputGroup.Text>
           <FaSearch />
         </InputGroup.Text>
-        <Form.Control placeholder="Search for Assignments" />
+        <Form.Control
+          placeholder="Search for Assignments"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </InputGroup>
 
       <h3 id="wd-assignments-title" className="mb-3">
-        ASSIGNMENTS 40% of Total <Button variant="success" size="sm" className="ms-2">+</Button>
+        ASSIGNMENTS <Button variant="success" size="sm" className="ms-2">+</Button>
       </h3>
 
       <ul id="wd-assignment-list" className="list-unstyled">
-        <li className="wd-assignment-list-item mb-3 border-start border-success ps-3">
-          <Link href="/Courses/1234/Assignments/123" className="fw-bold text-decoration-none">
-            A1 - ENV + HTML
-          </Link>
-          <div className="text-muted small">
-            Multiple Modules | Not available until May 6 at 12:00am | Due May 13 at 11:59pm | 100 pts
-          </div>
-        </li>
-        <li className="wd-assignment-list-item mb-3 border-start border-success ps-3">
-          <Link href="/Courses/1234/Assignments/124" className="fw-bold text-decoration-none">
-            A2 - CSS + BOOTSTRAP
-          </Link>
-          <div className="text-muted small">
-            Multiple Modules | Not available until May 13 at 12:00am | Due May 20 at 11:59pm | 100 pts
-          </div>
-        </li>
-        <li className="wd-assignment-list-item mb-3 border-start border-success ps-3">
-          <Link href="/Courses/1234/Assignments/125" className="fw-bold text-decoration-none">
-            A3 - JAVASCRIPT + REACT
-          </Link>
-          <div className="text-muted small">
-            Multiple Modules | Not available until May 20 at 12:00am | Due May 27 at 11:59pm | 100 pts
-          </div>
-        </li>
+        {assignments.map((assignment) => (
+          <li key={assignment._id} className="wd-assignment-list-item mb-3 border-start border-success ps-3">
+            <Link href={`/Courses/${courseId}/Assignments/${assignment._id}`} className="fw-bold text-decoration-none">
+              {assignment.title}
+            </Link>
+          </li>
+        ))}
+        {assignments.length === 0 && (
+          <li className="text-muted">No assignments found for this course.</li>
+        )}
       </ul>
     </div>
   );
