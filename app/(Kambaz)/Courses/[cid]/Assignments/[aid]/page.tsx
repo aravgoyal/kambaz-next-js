@@ -10,7 +10,7 @@ export default function AssignmentEditor() {
   const params = useParams();
   const { courseId, assignmentId } = params;
 
-  const [assignment, setAssignment] = useState<any>(null);
+  const [assignment, setAssignment] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [points, setPoints] = useState(100);
