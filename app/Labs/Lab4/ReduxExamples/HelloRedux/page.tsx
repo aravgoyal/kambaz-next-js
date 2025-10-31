@@ -1,3 +1,4 @@
+"use client";
 import { useSelector, useDispatch } from "react-redux";
 export default function HelloRedux() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
