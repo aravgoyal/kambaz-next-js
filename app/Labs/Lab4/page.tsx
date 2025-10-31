@@ -11,7 +11,7 @@ import ObjectStateVariable from "./ObjectStateVariables";
 import ArrayStateVariable from "./ArrayStateVariables";
 import ParentStateComponent from "./ParentStateComponent";
 import ReduxExamples from "./ReduxExamples/page";
-import store from "../store";
+import store from "./store";
 import { Provider } from "react-redux";
 
 export default function Lab4() {
