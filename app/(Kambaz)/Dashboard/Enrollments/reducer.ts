@@ -19,6 +19,7 @@ const enrollmentsSlice = createSlice({
     },
     unenrollFromCourse: (state, { payload: { userId, courseId } }) => {
       state.enrollments = state.enrollments.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (enrollment: any) =>
           !(enrollment.user === userId && enrollment.course === courseId)
       );

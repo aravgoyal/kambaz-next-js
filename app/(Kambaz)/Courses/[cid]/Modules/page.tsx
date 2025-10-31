@@ -14,6 +14,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 export default function Modules() {
   const { cid } = useParams();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { modules } = useSelector((state: any) => state.modulesReducer);
   const [moduleName, setModuleName] = useState("");
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ export default function Modules() {
     <div>
       <ModulesControls setModuleName={setModuleName} moduleName={moduleName} addModule={() => { dispatch(addModule({ name: moduleName, course: cid })); setModuleName(""); }} /><br /><br /><br /><br />
   <ListGroup className="rounded-0" id="wd-modules">
+    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
     {modules.map((module: { _id: Key | null | undefined; editing: any; name: string | number | readonly string[] | undefined; }) => (
       <ListGroupItem key={module._id} className="wd-module p-0 mb-5 fs-5 border-gray">
         <div className="wd-title p-3 ps-2 bg-secondary">

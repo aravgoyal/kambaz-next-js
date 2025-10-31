@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addTodo, updateTodo, setTodo } from "./todoReducer";
 
 export default function TodoForm() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { todo } = useSelector((state: any) => state.todosReducer);
   const dispatch = useDispatch();
   return (

@@ -4,6 +4,7 @@ import { ListGroup } from "react-bootstrap";
 import ListGroupItem from "react-bootstrap/esm/ListGroupItem";
 import { useSelector } from "react-redux";
 export default function ArrayStateVariable() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
  const todos = useSelector((state: any) => state?.todosReducer?.todos ?? []);
  const [array, setArray] = useState([1, 2, 3, 4, 5]);
  const addElement = () => {
@@ -18,6 +19,7 @@ const deleteElement = (index: number) => {
    <button onClick={addElement}>Add Element</button>
    <ul>
     <ListGroup>
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {todos.map((todo: any) => (
           <ListGroupItem key={todo.id}>
             {todo.title}

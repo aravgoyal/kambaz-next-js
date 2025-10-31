@@ -7,11 +7,15 @@ import Link from "next/link";
 import { Row, Col, Card, CardImg, CardBody, CardTitle, CardText, Button, FormControl } from "react-bootstrap";
 
 export default function Dashboard() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { currentUser } = useSelector((state: any) => state.accountReducer);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { courses } = useSelector((state: any) => state.coursesReducer);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { enrollments } = useSelector((state: any) => state.enrollmentsReducer);
   const dispatch = useDispatch();
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [course, setCourse] = useState<any>({
     _id: "0",
     name: "New Course",
@@ -29,6 +33,7 @@ export default function Dashboard() {
   // Check if user is enrolled in a course
   const isEnrolled = (courseId: string) => {
     return enrollments.some(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (enrollment: any) =>
         enrollment.user === currentUser?._id && enrollment.course === courseId
     );
@@ -47,6 +52,7 @@ export default function Dashboard() {
   // Filter courses based on showAllCourses toggle
   const displayedCourses = showAllCourses
     ? courses
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     : courses.filter((course: any) => isEnrolled(course._id));
 
   return (
@@ -105,6 +111,7 @@ export default function Dashboard() {
 
       <div id="wd-dashboard-courses">
         <Row xs={1} md={5} className="g-4">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {displayedCourses.map((course: any) => (
             <Col
               key={course._id}
