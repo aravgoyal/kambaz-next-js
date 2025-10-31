@@ -28,6 +28,7 @@ const modulesSlice = createSlice({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       state.modules = state.modules.map((m: any) =>
         m._id === module._id ? module : m
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as any;
     },
     editModule: (state, { payload: moduleId }) => {

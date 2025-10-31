@@ -13,7 +13,7 @@ export default function Signin() {
  const dispatch = useDispatch();
  const signin = () => {
    const user = db.users.find(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-anys
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
      (u: any) =>
        u.username === credentials.username &&
        u.password === credentials.password
