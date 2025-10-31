@@ -1,16 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import * as db from "../../../../Database";
+import { useDispatch, useSelector } from "react-redux";
+import { addAssignment, updateAssignment } from "../reducer";
 
 export default function AssignmentEditor() {
   const params = useParams();
-  const { courseId, assignmentId } = params;
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { cid: courseId, assignmentId } = params;
 
-  const [assignment, setAssignment] = useState(null);
+  const assignments = useSelector((state: any) => state?.assignmentsReducer?.assignments ?? []);
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [points, setPoints] = useState(100);
@@ -18,20 +21,71 @@ export default function AssignmentEditor() {
   const [availableFrom, setAvailableFrom] = useState("");
   const [availableUntil, setAvailableUntil] = useState("");
 
+  const isNewAssignment = assignmentId === "new";
+
+  // Helper function to format date for datetime-local input
+  const formatDateForInput = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    // Format: YYYY-MM-DDTHH:MM
+    return date.toISOString().slice(0, 16);
+  };
+
   useEffect(() => {
-    const a = db.assignments.find(
-      (item) => item._id === assignmentId && item.course === courseId
-    );
+    if (!isNewAssignment) {
+      const assignment = assignments.find(
+        (a: any) => a._id === assignmentId && a.course === courseId
+      );
 
-  }, [assignmentId, courseId]);
+      if (assignment) {
+        setTitle(assignment.title || "");
+        setDescription(assignment.description || "");
+        setPoints(assignment.points || 100);
+        setDueDate(formatDateForInput(assignment.dueDate) || "");
+        setAvailableFrom(formatDateForInput(assignment.availableFromDate) || "");
+        setAvailableUntil(formatDateForInput(assignment.availableUntilDate) || "");
+      }
+    } else {
+      // Reset form for new assignment
+      setTitle("");
+      setDescription("");
+      setPoints(100);
+      setDueDate("");
+      setAvailableFrom("");
+      setAvailableUntil("");
+    }
+  }, [assignmentId, courseId, assignments, isNewAssignment]);
 
-  if (!assignment) {
-    return <p className="p-3">Assignment not found.</p>;
-  }
+  const handleSave = () => {
+    const assignmentData = {
+      title,
+      description,
+      points,
+      dueDate,
+      availableFromDate: availableFrom,
+      availableUntilDate: availableUntil,
+      course: courseId,
+    };
+
+    if (isNewAssignment) {
+      dispatch(addAssignment(assignmentData));
+    } else {
+      dispatch(updateAssignment({
+        _id: assignmentId,
+        ...assignmentData,
+      }));
+    }
+
+    router.push(`/Courses/${courseId}/Assignments`);
+  };
+
+  const handleCancel = () => {
+    router.push(`/Courses/${courseId}/Assignments`);
+  };
 
   return (
     <div id="wd-assignments-editor" className="p-3">
-      <h2>Edit Assignment</h2>
+      <h2>{isNewAssignment ? "Create New Assignment" : "Edit Assignment"}</h2>
 
       <Form>
         <Form.Group className="mb-3" controlId="wd-name">
@@ -40,6 +94,7 @@ export default function AssignmentEditor() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter assignment name"
           />
         </Form.Group>
 
@@ -50,6 +105,7 @@ export default function AssignmentEditor() {
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter assignment description"
           />
         </Form.Group>
 
@@ -140,12 +196,12 @@ export default function AssignmentEditor() {
         </Row>
 
         <div className="d-flex justify-content-end gap-2">
-          <Link href={`/Courses/${courseId}/Assignments`} className="btn btn-secondary">
+          <Button variant="secondary" onClick={handleCancel}>
             Cancel
-          </Link>
-          <Link href={`/Courses/${courseId}/Assignments`} className="btn btn-primary">
+          </Button>
+          <Button variant="primary" onClick={handleSave}>
             Save
-          </Link>
+          </Button>
         </div>
       </Form>
     </div>
