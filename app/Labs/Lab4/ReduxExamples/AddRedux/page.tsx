@@ -1,11 +1,11 @@
 "use client";
 
+import { Provider } from "react-redux";
 import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 import { add } from "./addReducer";
 import { Button, FormControl } from "react-bootstrap";
-
-export const dynamic = 'force-dynamic';
+import store from "../../store";
 
 export default function AddRedux() {
   const [a, setA] = useState(12);
@@ -15,6 +15,7 @@ export default function AddRedux() {
   const dispatch = useDispatch();
   
   return (
+    <Provider store={store}>
     <div className="w-25" id="wd-add-redux">
       <h1>Add Redux</h1>
       <h2>{a} + {b} = {sum}</h2>
@@ -36,5 +37,6 @@ export default function AddRedux() {
       </Button>
       <hr/>
     </div>
+    </Provider>
   );
 }

@@ -4,13 +4,14 @@ import TodoForm from "./TodoForm";
 import TodoItem from "./TodoItem";
 import { useSelector } from "react-redux";
 import { ListGroup } from "react-bootstrap";
-
-export const dynamic = 'force-dynamic';
+import store from "../../store";
+import { Provider } from "react-redux";
 
 export default function TodoList() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { todos } = useSelector((state: any) => state.todosReducer);
   return (
+    <Provider store={store}>
     <div id="wd-todo-list-redux">
       <h2>Todo List</h2>
       <ListGroup>
@@ -22,4 +23,5 @@ export default function TodoList() {
       </ListGroup>
       <hr/>
     </div>
+    </Provider>
 );}
