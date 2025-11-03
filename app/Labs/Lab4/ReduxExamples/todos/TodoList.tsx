@@ -13,6 +13,7 @@ export default function TodoList() {
       <h2>Todo List</h2>
       <ListGroup>
         <TodoForm />
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {todos.map((todo: any, idx: number) => (
           <TodoItem todo={todo} key={todo.id ?? todo._id ?? idx} />
         ))}
