@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+"use client";
+import React, { use, useEffect, useState } from "react";
 import axios from "axios";
 import * as client from "./client";
 
