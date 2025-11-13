@@ -30,8 +30,8 @@ export default function Modules() {
 const onCreateModuleForCourse = async () => {
     if (!cid || typeof cid !== "string") return;
     const newModule = { name: moduleName, course: cid };
-    const module = await client.createModuleForCourse(cid, newModule);
-    dispatch(setModules([...modules, module]));
+    const module1 = await client.createModuleForCourse(cid, newModule);
+    dispatch(setModules([...modules, module1]));
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
