@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { addAssignment, updateAssignment } from "../reducer";
+import * as client from "../client";
 
 export default function AssignmentEditor() {
   const params = useParams();
@@ -12,7 +13,6 @@ export default function AssignmentEditor() {
   const dispatch = useDispatch();
   const { cid: courseId, assignmentId } = params;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignments = useSelector((state: any) => state?.assignmentsReducer?.assignments ?? []);
 
   const [title, setTitle] = useState("");
@@ -24,18 +24,15 @@ export default function AssignmentEditor() {
 
   const isNewAssignment = assignmentId === "new";
 
-  // Helper function to format date for datetime-local input
   const formatDateForInput = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    // Format: YYYY-MM-DDTHH:MM
     return date.toISOString().slice(0, 16);
   };
 
   useEffect(() => {
     if (!isNewAssignment) {
       const assignment = assignments.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (a: any) => a._id === assignmentId && a.course === courseId
       );
 
@@ -48,7 +45,6 @@ export default function AssignmentEditor() {
         setAvailableUntil(formatDateForInput(assignment.availableUntilDate) || "");
       }
     } else {
-      // Reset form for new assignment
       setTitle("");
       setDescription("");
       setPoints(100);
@@ -58,7 +54,7 @@ export default function AssignmentEditor() {
     }
   }, [assignmentId, courseId, assignments, isNewAssignment]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const assignmentData = {
       title,
       description,
@@ -69,16 +65,24 @@ export default function AssignmentEditor() {
       course: courseId,
     };
 
-    if (isNewAssignment) {
-      dispatch(addAssignment(assignmentData));
-    } else {
-      dispatch(updateAssignment({
-        _id: assignmentId,
-        ...assignmentData,
-      }));
+    try {
+      if (isNewAssignment) {
+        const newAssignment = await client.createAssignment(courseId as string, assignmentData);
+        dispatch(addAssignment(newAssignment));
+      } else {
+        await client.updateAssignment(courseId as string, {
+          _id: assignmentId,
+          ...assignmentData,
+        });
+        dispatch(updateAssignment({
+          _id: assignmentId,
+          ...assignmentData,
+        }));
+      }
+      router.push(`/Courses/${courseId}/Assignments`);
+    } catch (error) {
+      console.error("Error saving assignment:", error);
     }
-
-    router.push(`/Courses/${courseId}/Assignments`);
   };
 
   const handleCancel = () => {

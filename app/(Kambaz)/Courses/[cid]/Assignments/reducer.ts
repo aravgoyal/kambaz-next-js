@@ -10,8 +10,11 @@ const assignmentsSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
+    setAssignments: (state, { payload: assignments }) => {
+      state.assignments = assignments;
+    },
     addAssignment: (state, { payload: assignment }) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const newAssignment: any = {
         _id: uuidv4(),
         title: assignment.title,
@@ -32,14 +35,14 @@ const assignmentsSlice = createSlice({
       );
     },
     updateAssignment: (state, { payload: assignment }) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       state.assignments = state.assignments.map((a: any) =>
         a._id === assignment._id ? assignment : a
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as any;
     },
     editAssignment: (state, { payload: assignmentId }) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       state.assignments = state.assignments.map((a: any) =>
         a._id === assignmentId ? { ...a, editing: true } : a
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,6 +51,12 @@ const assignmentsSlice = createSlice({
   },
 });
 
-export const { addAssignment, deleteAssignment, updateAssignment, editAssignment } =
-  assignmentsSlice.actions;
+export const { 
+  setAssignments, 
+  addAssignment, 
+  deleteAssignment, 
+  updateAssignment, 
+  editAssignment 
+} = assignmentsSlice.actions;
+
 export default assignmentsSlice.reducer;
