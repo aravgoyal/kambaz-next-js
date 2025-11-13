@@ -24,6 +24,7 @@ export default function Dashboard() {
 
   const onUpdateCourse = async () => {
     await coursesClient.updateCourse(course);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(setCourses(courses.map((c: { _id: any; }) => {
         if (c._id === course._id) { return course; }
         else { return c; }

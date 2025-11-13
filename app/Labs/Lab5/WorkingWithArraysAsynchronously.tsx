@@ -7,6 +7,7 @@ import { FormControl, ListGroup, ListGroupItem } from "react-bootstrap";
 import { FaPencil, FaTrash } from "react-icons/fa6";
 import { TiDelete } from "react-icons/ti";
 export default function WorkingWithArraysAsynchronously() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [todos, setTodos] = useState<any[]>([]);
   const createNewTodo = async () => {
     const todos = await client.createNewTodo();
@@ -16,6 +17,7 @@ export default function WorkingWithArraysAsynchronously() {
     const todos = await client.fetchTodos();
     setTodos(todos);
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const removeTodo = async (todo: any) => {
     const updatedTodos = await client.removeTodo(todo);
     setTodos(updatedTodos);
@@ -26,26 +28,31 @@ export default function WorkingWithArraysAsynchronously() {
     };
       const [errorMessage, setErrorMessage] = useState(null);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const deleteTodo = async (todo: any) => {
     try {
       await client.deleteTodo(todo);
       const newTodos = todos.filter((t) => t.id !== todo.id);
       setTodos(newTodos);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
       setErrorMessage(error.response.data.message);
     }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
    const editTodo = (todo: any) => {
     const updatedTodos = todos.map(
       (t) => t.id === todo.id ? { ...todo, editing: true } : t );
     setTodos(updatedTodos);
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateTodo = async (todo: any) => {
     try {
       await client.updateTodo(todo);
       setTodos(todos.map((t) => (t.id === todo.id ? todo : t)));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setErrorMessage(error.response.data.message);
     }

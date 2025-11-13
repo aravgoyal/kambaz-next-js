@@ -8,6 +8,7 @@ export const findAssignmentsForCourse = async (courseId: string) => {
   return response.data;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createAssignment = async (courseId: string, assignment: any) => {
   const response = await axios.post(
     `${ASSIGNMENTS_API}/${courseId}/assignments`,
@@ -16,6 +17,7 @@ export const createAssignment = async (courseId: string, assignment: any) => {
   return response.data;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const updateAssignment = async (courseId: string, assignment: any) => {
   const response = await axios.put(
     `${ASSIGNMENTS_API}/${courseId}/assignments/${assignment._id}`,

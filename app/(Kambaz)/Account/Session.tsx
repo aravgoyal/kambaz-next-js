@@ -3,6 +3,7 @@ import * as client from "./client";
 import { useEffect, useState } from "react";
 import { setCurrentUser } from "./reducer";
 import { useDispatch } from "react-redux";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Session({ children }: { children: any }) {
   const [pending, setPending] = useState(true);
   const dispatch = useDispatch();
@@ -10,6 +11,8 @@ export default function Session({ children }: { children: any }) {
     try {
       const currentUser = await client.profile();
       dispatch(setCurrentUser(currentUser));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     } catch (err: any) {
       console.error(err);
     }

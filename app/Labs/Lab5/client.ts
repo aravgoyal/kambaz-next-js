@@ -18,6 +18,7 @@ export const fetchTodos = async () => {
   const response = await axios.get(TODOS_API);
   return response.data;
 };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const removeTodo = async (todo: any) => {
   const response = await axios.get(`${TODOS_API}/${todo.id}/delete`);
   return response.data;
@@ -26,14 +27,17 @@ export const createNewTodo = async () => {
   const response = await axios.get(`${TODOS_API}/create`);
   return response.data;
 };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const postNewTodo = async (todo: any) => {
   const response = await axios.post(`${TODOS_API}`, todo);
   return response.data;
 };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const deleteTodo = async (todo: any) => {
   const response = await axios.delete(`${TODOS_API}/${todo.id}`);
   return response.data;
 };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const updateTodo = async (todo: any) => {
   const response = await axios.put(`${TODOS_API}/${todo.id}`, todo);
   return response.data;

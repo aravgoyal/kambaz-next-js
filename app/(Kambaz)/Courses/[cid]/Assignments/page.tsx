@@ -18,6 +18,7 @@ export default function Assignments() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignments = useSelector((state: any) => state?.assignmentsReducer?.assignments ?? []);
 
   const fetchAssignments = async () => {
@@ -34,6 +35,7 @@ export default function Assignments() {
   }, [courseId]);
 
   const courseAssignments = assignments.filter(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (a: any) => 
       a.course === courseId && 
       a.title.toLowerCase().includes(search.toLowerCase())
@@ -97,6 +99,7 @@ export default function Assignments() {
       </h3>
 
       <ul id="wd-assignment-list" className="list-unstyled">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
         {courseAssignments.map((assignment: any) => (
           <li 
             key={assignment._id} 

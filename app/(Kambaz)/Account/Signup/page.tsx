@@ -8,6 +8,7 @@ import { FormControl, Button } from "react-bootstrap";
 import * as client from "../client";
 
 export default function Signup() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>({});
   const dispatch = useDispatch();
   const signup = async () => {

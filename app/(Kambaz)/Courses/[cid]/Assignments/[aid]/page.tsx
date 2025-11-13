@@ -13,6 +13,7 @@ export default function AssignmentEditor() {
   const dispatch = useDispatch();
   const { cid: courseId, assignmentId } = params;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignments = useSelector((state: any) => state?.assignmentsReducer?.assignments ?? []);
 
   const [title, setTitle] = useState("");
@@ -33,6 +34,7 @@ export default function AssignmentEditor() {
   useEffect(() => {
     if (!isNewAssignment) {
       const assignment = assignments.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (a: any) => a._id === assignmentId && a.course === courseId
       );
 
