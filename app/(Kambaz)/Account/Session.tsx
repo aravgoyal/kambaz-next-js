@@ -12,7 +12,6 @@ export default function Session({ children }: { children: any }) {
       const currentUser = await client.profile();
       dispatch(setCurrentUser(currentUser));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
     } catch (err: any) {
       console.error(err);
     }
