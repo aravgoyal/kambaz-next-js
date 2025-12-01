@@ -46,6 +46,7 @@ export const deleteUser = async (userId: string) => {
   const response = await axios.delete( `${USERS_API}/${userId}` );
   return response.data;
 };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createUser = async (user: any) => {
   const response = await axios.post(`${USERS_API}`, user);
   return response.data;

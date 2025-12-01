@@ -19,6 +19,7 @@ export default function PeopleDetails({ uid, onClose }: { uid: string | null; on
     onClose();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>({});
   const deleteUser = async (uid: string) => {
     await client.deleteUser(uid);
