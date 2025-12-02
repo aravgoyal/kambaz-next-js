@@ -1,44 +1,28 @@
 "use client";
+import { useState } from "react";
+import { useParams } from "next/navigation";
 import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 import PeopleDetails from "../Details";
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import * as coursesClient from "../../../client";
 
-export default function PeopleTable() {
+export default function PeopleTable({ users = [], fetchUsers }: { users?: any[]; fetchUsers: () => void }) {
   const { cid } = useParams();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [users, setUsers] = useState<any[]>([]);
   const [showDetails, setShowDetails] = useState(false);
   const [showUserId, setShowUserId] = useState<string | null>(null);
 
-  const fetchUsers = async () => {
-    try {
-      if (cid) {
-        const enrolledUsers = await coursesClient.findUsersForCourse(cid as string);
-        setUsers(enrolledUsers);
-      }
-    } catch (error) {
-      console.error("Error fetching users for course:", error);
-    }
+  const handleUserClick = (userId: string) => {
+    setShowDetails(true);
+    setShowUserId(userId);
   };
 
-  useEffect(() => {
+  const handleCloseDetails = () => {
+    setShowDetails(false);
     fetchUsers();
-  }, [cid]);
+  };
 
   return (
     <div id="wd-people-table">
-      {showDetails && (
-        <PeopleDetails
-          uid={showUserId}
-          onClose={() => {
-            setShowDetails(false);
-            fetchUsers();
-          }}
-        />
-      )}
+      {showDetails && <PeopleDetails uid={showUserId} onClose={handleCloseDetails} />}
       <Table striped>
         <thead>
           <tr>
@@ -54,15 +38,9 @@ export default function PeopleTable() {
           {users.map((user) => (
             <tr key={user._id}>
               <td className="wd-full-name text-nowrap">
-                <span
-                  className="text-decoration-none"
-                  onClick={() => {
-                    setShowDetails(true);
-                    setShowUserId(user._id);
-                  }}
-                >
+                <span className="text-decoration-none" style={{ cursor: "pointer" }} onClick={() => handleUserClick(user._id)}>
                   <FaUserCircle className="me-2 fs-1 text-secondary" />
-                  <span className="wd-first-name">{user.firstName} </span>
+                  <span className="wd-first-name">{user.firstName}</span>{" "}
                   <span className="wd-last-name">{user.lastName}</span>
                 </span>
               </td>
