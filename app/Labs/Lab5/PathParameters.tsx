@@ -5,7 +5,7 @@ import { FormControl } from "react-bootstrap";
 export default function PathParameters() {
   const [a, setA] = useState("34");
   const [b, setB] = useState("23");
-    const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
+    const HTTP_SERVER = process.env.NEXT_PUBLIC_REMOTE_SERVER;
   return (
     <div>
       <h3>Path Parameters</h3>

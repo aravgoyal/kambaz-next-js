@@ -1,7 +1,7 @@
 import axios from "axios";
 const axiosWithCredentials = axios.create({ withCredentials: true });
-export const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
-export const USERS_API = `${HTTP_SERVER}/api/users`;
+export const REMOTE_SERVER = process.env.NEXT_PUBLIC_REMOTE_SERVER;
+export const USERS_API = `${REMOTE_SERVER}/api/users`;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const signin = async (credentials: any) => {
   const response = await axiosWithCredentials.post(`${USERS_API}/signin`, credentials);

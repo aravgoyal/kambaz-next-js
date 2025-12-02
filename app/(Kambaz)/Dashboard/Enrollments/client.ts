@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
-const ENROLLMENTS_API = `${HTTP_SERVER}/api/enrollments`;
+const REMOTE_SERVER = process.env.NEXT_PUBLIC_REMOTE_SERVER;
+const ENROLLMENTS_API = `${REMOTE_SERVER}/api/enrollments`;
 
 export const enrollUserInCourse = async (userId: string, courseId: string) => {
   const response = await axios.post(`${ENROLLMENTS_API}/${userId}/${courseId}`);
