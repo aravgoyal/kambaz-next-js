@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCourses } from "../Courses/reducer";
 import { setEnrollments, enrollInCourse, unenrollFromCourse } from "./Enrollments/reducer";
 import { useEffect, useState } from "react";
+import * as client from "../Courses/client";
 import Link from "next/link";
 import { Row, Col, Card, CardImg, CardBody, CardTitle, CardText, Button, FormControl } from "react-bootstrap";
 
@@ -88,7 +89,7 @@ export default function Dashboard() {
   // Handle enrollment
   const handleEnroll = async (courseId: string) => {
     try {
-      await enrollmentsClient.enrollUserInCourse(currentUser._id, courseId);
+      await client.enrollIntoCourse(currentUser._id, courseId);
       dispatch(enrollInCourse({ userId: currentUser._id, courseId }));
     } catch (error) {
       console.error("Error enrolling in course:", error);
@@ -98,7 +99,7 @@ export default function Dashboard() {
   // Handle unenrollment
   const handleUnenroll = async (courseId: string) => {
     try {
-      await enrollmentsClient.unenrollUserFromCourse(currentUser._id, courseId);
+      await client.unenrollFromCourse(currentUser._id, courseId);
       dispatch(unenrollFromCourse({ userId: currentUser._id, courseId }));
     } catch (error) {
       console.error("Error unenrolling from course:", error);

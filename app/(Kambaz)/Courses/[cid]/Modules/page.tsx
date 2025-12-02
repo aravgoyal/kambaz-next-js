@@ -20,11 +20,13 @@ export default function Modules() {
   const [moduleName, setModuleName] = useState("");
   const dispatch = useDispatch();
 
-  const onRemoveModule = async (moduleId: string) => {
-    await client.deleteModule(moduleId);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dispatch(setModules(modules.filter((m: any) => m._id !== moduleId)));
-  };
+const onRemoveModule = async (moduleId: string) => {
+  if (!cid || typeof cid !== "string") return;
+  await client.deleteModule(cid, moduleId);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dispatch(setModules(modules.filter((m: any) => m._id !== moduleId)));
+};
+
 
 
 const onCreateModuleForCourse = async () => {
@@ -34,13 +36,17 @@ const onCreateModuleForCourse = async () => {
     dispatch(setModules([...modules, module1]));
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onUpdateModule = async (module1: any) => {
-    await client.updateModule(module1);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newModules = modules.map((m: any) => m._id === module1._id ? module1 : m );
-    dispatch(setModules(newModules));
-  };
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
+ const onUpdateModule = async (module: any) => {
+   if (!cid || typeof cid !== "string") return;
+   await client.updateModule(cid, module);
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   const newModules = modules.map((m: any) =>
+     m._id === module._id ? module : m
+   );
+   dispatch(setModules(newModules));
+ };
+
 
 
 
