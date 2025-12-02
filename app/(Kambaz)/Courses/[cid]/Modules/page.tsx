@@ -1,111 +1,136 @@
 "use client";
-import { Key, useEffect, useState } from "react";
-import { FormControl, ListGroup, ListGroupItem } from "react-bootstrap";
-import ModulesControls from "./ModulesControls";
-import { BsGripVertical } from "react-icons/bs";
-import LessonControlButtons from "./LessonControlButtons";
 import { useParams } from "next/navigation";
-import * as db from "../../../Database";
-import { v4 as uuidv4 } from "uuid";
+import { FormControl, ListGroup, ListGroupItem } from "react-bootstrap";
+import { BsGripVertical } from "react-icons/bs";
+import ModulesControls from "./ModulesControls";
+import LessonControlButtons from "./LessonControlButtons";
 import ModuleControlButtons from "./ModuleControlButtons";
-import { setModules, addModule, editModule, updateModule, deleteModule }
-  from "./reducer";
+import { useEffect, useState } from "react";
+import {
+  addModule,
+  editModule,
+  updateModule,
+  deleteModule,
+  setModules,
+} from "./reducer";
 import { useSelector, useDispatch } from "react-redux";
-import * as client from "../../client";
+import { RootState } from "../../../store";
+import * as coursesClient from "../../client";
 
 export default function Modules() {
   const { cid } = useParams();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { modules } = useSelector((state: any) => state.modulesReducer);
+  const courseId = Array.isArray(cid) ? cid[0] : cid;
   const [moduleName, setModuleName] = useState("");
+  const { modules } = useSelector((state: RootState) => state.modulesReducer);
   const dispatch = useDispatch();
+  const onCreateModuleForCourse = async () => {
+    if (!courseId) return;
+    const newModule = { name: moduleName, course: courseId };
+    const module = await coursesClient.createModuleForCourse(
+      courseId,
+      newModule
+    );
+    dispatch(setModules([...modules, module]));
+    setModuleName("");
+  };
 
   const onRemoveModule = async (moduleId: string) => {
-    await client.deleteModule(moduleId);
+    await coursesClient.deleteModule(moduleId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(setModules(modules.filter((m: any) => m._id !== moduleId)));
   };
 
-
-const onCreateModuleForCourse = async () => {
-    if (!cid || typeof cid !== "string") return;
-    const newModule = { name: moduleName, course: cid };
-    const module1 = await client.createModuleForCourse(cid, newModule);
-    dispatch(setModules([...modules, module1]));
-  };
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onUpdateModule = async (module1: any) => {
-    await client.updateModule(module1);
+  const onUpdateModule = async (module: any) => {
+    await coursesClient.updateModule(module);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newModules = modules.map((m: any) => m._id === module1._id ? module1 : m );
+    const newModules = modules.map((m: any) =>
+      m._id === module._id ? module : m
+    );
     dispatch(setModules(newModules));
   };
-
-
-
   const fetchModules = async () => {
-    const modules = await client.findModulesForCourse(cid as string);
-    dispatch(setModules(modules));
+    if (!courseId) return;
+    try {
+      const fetchedModules = await coursesClient.findModulesForCourse(courseId);
+      dispatch(setModules(fetchedModules));
+    } catch (error) {
+      console.error("Error fetching modules:", error);
+    }
   };
+
   useEffect(() => {
     fetchModules();
-  }, []);
-
+  }, [courseId]);
 
   return (
-    <div>
-      <ModulesControls setModuleName={setModuleName} moduleName={moduleName} addModule={onCreateModuleForCourse} /><br /><br /><br /><br />
-  <ListGroup className="rounded-0" id="wd-modules">
-    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-    {modules.map((module: { _id: Key | null | undefined; editing: any; name: string | number | readonly string[] | undefined; }) => (
-      <ListGroupItem key={module._id} className="wd-module p-0 mb-5 fs-5 border-gray">
-        <div className="wd-title p-3 ps-2 bg-secondary">
-          <BsGripVertical className="me-2 fs-3" />{" "}
-          {!module.editing ? (
-            module.name || "Unnamed Module"
-          ) : (
-            <FormControl
-              className="w-50 d-inline-block"
-              onChange={(e) =>
+    <div className="wd-modules">
+      <ModulesControls
+        setModuleName={setModuleName}
+        moduleName={moduleName}
+        addModule={onCreateModuleForCourse}
+      />
+
+      <br />
+      <br />
+      <br />
+      <br />
+
+      <ListGroup id="wd-modules" className="rounded-0">
+        {modules
+        //  eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .filter((module: any) => module.course === cid)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((module: any) => (
+            <ListGroupItem
+              key={module._id}
+              className="wd-module p-0 mb-5 fs-5 border-gray"
+            >
+              <div className="wd-title p-3 ps-2 bg-secondary">
+                <BsGripVertical className="me-2 fs-3" />
+                {!module.editing && module.name}
+                {module.editing && (
+                  <FormControl
+                    className="w-50 d-inline-block"
+                    onChange={(e) =>
                       dispatch(
                         updateModule({ ...module, name: e.target.value })
                       )
                     }
-              onKeyDown={(e) => {
+                    onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         onUpdateModule({ ...module, editing: false });
                       }
                     }}
-              defaultValue={module.name}
-            />
-          )}
-          <ModuleControlButtons moduleId={module._id?.toString() || ""}
-               deleteModule={(moduleId) => onRemoveModule(moduleId)}
-               editModule={(moduleId) => dispatch(editModule(moduleId))} />
-        </div>
-        <ListGroup className="wd-lessons rounded-0">
-          <ListGroupItem className="wd-lesson p-3 ps-1">
-            <BsGripVertical className="me-2 fs-3" /> LEARNING OBJECTIVES <LessonControlButtons />
-          </ListGroupItem>
-          <ListGroupItem className="wd-lesson p-3 ps-1">
-            <BsGripVertical className="me-2 fs-3" /> Introduction to the course <LessonControlButtons />
-          </ListGroupItem>
-          <ListGroupItem className="wd-lesson p-3 ps-1">
-            Learn what is Web Development </ListGroupItem>
-        </ListGroup>
-      </ListGroupItem>
-    ))}
-    <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-      <div className="wd-title p-3 ps-2 bg-secondary"> Week 2 </div>
-      <ListGroup className="wd-lessons rounded-0">
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          LESSON 1 </ListGroupItem>
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          LESSON 2 </ListGroupItem>
-      </ListGroup>
-    </ListGroupItem>
-  </ListGroup>
+                    defaultValue={module.name}
+                  />
+                )}
 
+                <ModuleControlButtons
+                  moduleId={module._id}
+                  deleteModule={(moduleId) => onRemoveModule(moduleId)}
+                  editModule={(moduleId) => dispatch(editModule(moduleId))}
+                />
+              </div>
+
+              {module.lessons && (
+                <ListGroup className="wd-lessons rounded-0">
+                { /* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {module.lessons.map((lesson: any) => (
+                    <ListGroupItem
+                      key={lesson._id}
+                      className="wd-lesson p-3 ps-1"
+                    >
+                      <BsGripVertical className="me-2 fs-3" />
+                      {lesson.name}
+                      <LessonControlButtons />
+                    </ListGroupItem>
+                  ))}
+                </ListGroup>
+              )}
+            </ListGroupItem>
+          ))}
+      </ListGroup>
     </div>
-);}
+  );
+}

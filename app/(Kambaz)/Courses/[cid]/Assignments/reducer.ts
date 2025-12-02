@@ -10,9 +10,6 @@ const assignmentsSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
-    setAssignments: (state, { payload: assignments }) => {
-      state.assignments = assignments;
-    },
     addAssignment: (state, { payload: assignment }) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const newAssignment: any = {
@@ -22,8 +19,8 @@ const assignmentsSlice = createSlice({
         description: assignment.description,
         points: assignment.points,
         dueDate: assignment.dueDate,
-        availableFromDate: assignment.availableFromDate,
-        availableUntilDate: assignment.availableUntilDate,
+        availableDate: assignment.availableDate,
+        availableUntil: assignment.availableUntil,
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       state.assignments = [...state.assignments, newAssignment] as any;
@@ -41,22 +38,12 @@ const assignmentsSlice = createSlice({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as any;
     },
-    editAssignment: (state, { payload: assignmentId }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      state.assignments = state.assignments.map((a: any) =>
-        a._id === assignmentId ? { ...a, editing: true } : a
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ) as any;
+    setAssignments: (state, action) => {
+      state.assignments = action.payload;
     },
   },
 });
 
-export const { 
-  setAssignments, 
-  addAssignment, 
-  deleteAssignment, 
-  updateAssignment, 
-  editAssignment 
-} = assignmentsSlice.actions;
-
+export const { addAssignment, deleteAssignment, updateAssignment, setAssignments } =
+  assignmentsSlice.actions;
 export default assignmentsSlice.reducer;

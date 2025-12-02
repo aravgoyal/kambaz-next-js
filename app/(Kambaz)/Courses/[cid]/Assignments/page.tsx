@@ -1,151 +1,133 @@
 "use client";
-
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Button, Form, InputGroup, Modal } from "react-bootstrap";
-import { FaPlus, FaSearch, FaTrash } from "react-icons/fa";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import { Button, Modal } from "react-bootstrap";
+import { FaSearch, FaPlus, FaCheckCircle, FaTrash } from "react-icons/fa";
+import { BsGripVertical } from "react-icons/bs";
+import { IoEllipsisVertical } from "react-icons/io5";
+import { FaFileLines } from "react-icons/fa6";
 import { useSelector, useDispatch } from "react-redux";
 import { setAssignments, deleteAssignment } from "./reducer";
-import * as client from "./client";
+import * as coursesClient from "../../client";
 
 export default function Assignments() {
-  const params = useParams();
-  const courseId = params.cid as string;
+  const { cid } = useParams();
   const dispatch = useDispatch();
-  
-  const [search, setSearch] = useState("");
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignments = useSelector((state: any) => state?.assignmentsReducer?.assignments ?? []);
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [assignmentToDelete, setAssignmentToDelete] = useState<any>(null);
+
+  const isFaculty = currentUser?.role === "FACULTY" || currentUser?.role === "ADMIN" || currentUser?.role === "TA";
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const courseAssignments = assignments.filter((a: any) => a.course === cid);
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  };
 
   const fetchAssignments = async () => {
-    try {
-      const assignments = await client.findAssignmentsForCourse(courseId);
-      dispatch(setAssignments(assignments));
-    } catch (error) {
-      console.error("Error fetching assignments:", error);
-    }
+    if (!cid) return;
+    const data = await coursesClient.findAssignmentsForCourse(cid as string);
+    dispatch(setAssignments(data));
   };
 
   useEffect(() => {
     fetchAssignments();
-  }, [courseId]);
+  }, [cid]);
 
-  const courseAssignments = assignments.filter(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (a: any) => 
-      a.course === courseId && 
-      a.title.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleDeleteClick = (assignmentId: string) => {
-    setAssignmentToDelete(assignmentId);
-    setShowDeleteDialog(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDeleteClick = (assignment: any) => {
+    setAssignmentToDelete(assignment);
+    setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
     if (assignmentToDelete) {
-      try {
-        await client.deleteAssignment(courseId, assignmentToDelete);
-        dispatch(deleteAssignment(assignmentToDelete));
-      } catch (error) {
-        console.error("Error deleting assignment:", error);
-      }
+      await coursesClient.deleteAssignment(assignmentToDelete._id);
+      dispatch(deleteAssignment(assignmentToDelete._id));
     }
-    setShowDeleteDialog(false);
+    setShowDeleteModal(false);
     setAssignmentToDelete(null);
   };
 
   const handleCancelDelete = () => {
-    setShowDeleteDialog(false);
+    setShowDeleteModal(false);
     setAssignmentToDelete(null);
   };
 
   return (
-    <div id="wd-assignments" className="p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h1 className="fw-bold">Assignments</h1>
-        <div className="d-flex">
-          <Button variant="success" className="me-2 d-flex align-items-center">
-            <FaPlus className="me-1" /> Group
-          </Button>
-          <Link href={`/Courses/${courseId}/Assignments/new`}>
-            <Button variant="success" className="d-flex align-items-center">
-              <FaPlus className="me-1" /> Assignment
-            </Button>
-          </Link>
+    <div id="wd-assignments" className="container-fluid">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="input-group" style={{ width: "300px" }}>
+          <span className="input-group-text bg-white"><FaSearch /></span>
+          <input type="text" className="form-control border-start-0" placeholder="Search for Assignments" id="wd-search-assignment" />
         </div>
+
+        {isFaculty && (
+          <div>
+            <Button variant="secondary" className="me-2" id="wd-add-assignment-group">
+              <FaPlus className="me-1" /> Group
+            </Button>
+            <Link href={`/Courses/${cid}/Assignments/new`}>
+              <Button variant="danger" id="wd-add-assignment">
+                <FaPlus className="me-1" /> Assignment
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
 
-      <InputGroup className="mb-4" style={{ maxWidth: "400px" }}>
-        <InputGroup.Text>
-          <FaSearch />
-        </InputGroup.Text>
-        <Form.Control
-          placeholder="Search for Assignments"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </InputGroup>
-
-      <h3 id="wd-assignments-title" className="mb-3">
-        ASSIGNMENTS 
-        <Link href={`/Courses/${courseId}/Assignments/new`}>
-          <Button variant="success" size="sm" className="ms-2">+</Button>
-        </Link>
-      </h3>
-
-      <ul id="wd-assignment-list" className="list-unstyled">
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
-        {courseAssignments.map((assignment: any) => (
-          <li 
-            key={assignment._id} 
-            className="wd-assignment-list-item mb-3 border-start border-success ps-3 d-flex justify-content-between align-items-start"
-          >
-            <div className="flex-grow-1">
-              <Link 
-                href={`/Courses/${courseId}/Assignments/${assignment._id}`} 
-                className="fw-bold text-decoration-none"
-              >
-                {assignment.title}
-              </Link>
-              <div className="text-muted small">
-                <span>Due: {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No due date'}</span>
-                {assignment.points && <span className="ms-3">Points: {assignment.points}</span>}
+      <ul id="wd-assignment-list" className="list-group rounded-0">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {courseAssignments.map((a: any) => (
+          <li key={a._id} className="list-group-item border-start border-success border-3">
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="d-flex">
+                <BsGripVertical className="me-2 fs-4 text-muted" />
+                <FaFileLines className="me-3 fs-4 text-success" />
+                <div>
+                  <Link href={`/Courses/${cid}/Assignments/${a._id}`} className="wd-assignment-link text-decoration-none fw-bold text-dark">
+                    {a.title}
+                  </Link>
+                  <div className="small text-muted">
+                    <span className="text-danger">Multiple Modules</span> |
+                    <strong> Not available until</strong> {formatDate(a.availableDate)} |
+                    <br />
+                    <strong>Due</strong> {formatDate(a.dueDate)} | {a.points || 0} pts
+                  </div>
+                </div>
+              </div>
+              <div className="d-flex align-items-center">
+                <FaCheckCircle className="text-success me-2" />
+                {isFaculty && (
+                  <FaTrash className="text-danger me-2" style={{ cursor: "pointer" }} onClick={() => handleDeleteClick(a)} />
+                )}
+                <IoEllipsisVertical className="fs-4" />
               </div>
             </div>
-            <Button 
-              variant="danger" 
-              size="sm"
-              onClick={() => handleDeleteClick(assignment._id)}
-              className="ms-2"
-            >
-              <FaTrash />
-            </Button>
           </li>
         ))}
-        {courseAssignments.length === 0 && (
-          <li className="text-muted">No assignments found for this course.</li>
-        )}
       </ul>
 
-      <Modal show={showDeleteDialog} onHide={handleCancelDelete} centered>
+      <Modal show={showDeleteModal} onHide={handleCancelDelete}>
         <Modal.Header closeButton>
-          <Modal.Title>Delete Assignment</Modal.Title>
+          <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to remove this assignment?
+          Are you sure you want to remove the assignment &quot;{assignmentToDelete?.title}&quot;?
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCancelDelete}>
-            No
-          </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
-            Yes
-          </Button>
+          <Button variant="secondary" onClick={handleCancelDelete}>Cancel</Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>Delete</Button>
         </Modal.Footer>
       </Modal>
     </div>

@@ -1,217 +1,118 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Form, Button, Row, Col } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { addAssignment, updateAssignment } from "../reducer";
-import * as client from "../client";
+import { Button } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { setAssignments } from "../reducer";
+import * as coursesClient from "../../../client";
 
 export default function AssignmentEditor() {
-  const params = useParams();
+  const { cid, aid } = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
-  const { cid: courseId, assignmentId } = params;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignments = useSelector((state: any) => state?.assignmentsReducer?.assignments ?? []);
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [points, setPoints] = useState(100);
-  const [dueDate, setDueDate] = useState("");
-  const [availableFrom, setAvailableFrom] = useState("");
-  const [availableUntil, setAvailableUntil] = useState("");
+  const isFaculty = currentUser?.role === "FACULTY" || currentUser?.role === "ADMIN";
+  const isNew = aid === "new";
 
-  const isNewAssignment = assignmentId === "new";
+  const [assignment, setAssignment] = useState({
+    _id: "",
+    title: "New Assignment",
+    course: cid as string,
+    description: "",
+    points: 100,
+    dueDate: "",
+    availableDate: "",
+    availableUntil: "",
+  });
 
-  const formatDateForInput = (dateString: string) => {
+  const formatDateTimeForInput = (dateString: string) => {
     if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toISOString().slice(0, 16);
+    return new Date(dateString).toISOString().slice(0, 16);
   };
 
   useEffect(() => {
-    if (!isNewAssignment) {
-      const assignment = assignments.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (a: any) => a._id === assignmentId && a.course === courseId
-      );
-
-      if (assignment) {
-        setTitle(assignment.title || "");
-        setDescription(assignment.description || "");
-        setPoints(assignment.points || 100);
-        setDueDate(formatDateForInput(assignment.dueDate) || "");
-        setAvailableFrom(formatDateForInput(assignment.availableFromDate) || "");
-        setAvailableUntil(formatDateForInput(assignment.availableUntilDate) || "");
+    const fetchAssignment = async () => {
+      if (!isNew && aid) {
+        const data = await coursesClient.findAssignmentById(aid as string);
+        setAssignment(data);
       }
-    } else {
-      setTitle("");
-      setDescription("");
-      setPoints(100);
-      setDueDate("");
-      setAvailableFrom("");
-      setAvailableUntil("");
-    }
-  }, [assignmentId, courseId, assignments, isNewAssignment]);
+    };
+    fetchAssignment();
+  }, [aid, isNew]);
 
   const handleSave = async () => {
-    const assignmentData = {
-      title,
-      description,
-      points,
-      dueDate,
-      availableFromDate: availableFrom,
-      availableUntilDate: availableUntil,
-      course: courseId,
-    };
-
-    try {
-      if (isNewAssignment) {
-        const newAssignment = await client.createAssignment(courseId as string, assignmentData);
-        dispatch(addAssignment(newAssignment));
-      } else {
-        await client.updateAssignment(courseId as string, {
-          _id: assignmentId,
-          ...assignmentData,
-        });
-        dispatch(updateAssignment({
-          _id: assignmentId,
-          ...assignmentData,
-        }));
-      }
-      router.push(`/Courses/${courseId}/Assignments`);
-    } catch (error) {
-      console.error("Error saving assignment:", error);
+    if (isNew) {
+      const newAssignment = await coursesClient.createAssignment(cid as string, assignment);
+      dispatch(setAssignments([...assignments, newAssignment]));
+    } else {
+      await coursesClient.updateAssignment(assignment);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      dispatch(setAssignments(assignments.map((a: any) => (a._id === assignment._id ? assignment : a))));
     }
+    router.push(`/Courses/${cid}/Assignments`);
   };
 
-  const handleCancel = () => {
-    router.push(`/Courses/${courseId}/Assignments`);
-  };
+  const handleCancel = () => router.push(`/Courses/${cid}/Assignments`);
+
+  if (!isFaculty) return null;
 
   return (
-    <div id="wd-assignments-editor" className="p-3">
-      <h2>{isNewAssignment ? "Create New Assignment" : "Edit Assignment"}</h2>
+    <div id="wd-assignments-editor" className="container-fluid" style={{ maxWidth: "800px" }}>
+      <label htmlFor="wd-name" className="form-label">Assignment Name</label>
+      <input id="wd-name" className="form-control mb-4" value={assignment.title} onChange={(e) => setAssignment({ ...assignment, title: e.target.value })} />
 
-      <Form>
-        <Form.Group className="mb-3" controlId="wd-name">
-          <Form.Label>Assignment Name</Form.Label>
-          <Form.Control
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter assignment name"
-          />
-        </Form.Group>
+      <textarea id="wd-description" className="form-control mb-4" rows={10} value={assignment.description} placeholder="Enter assignment description..." onChange={(e) => setAssignment({ ...assignment, description: e.target.value })} />
 
-        <Form.Group className="mb-3" controlId="wd-description">
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter assignment description"
-          />
-        </Form.Group>
-
-        <Row className="mb-3">
-          <Col md={4}>
-            <Form.Group controlId="wd-points">
-              <Form.Label>Points</Form.Label>
-              <Form.Control
-                type="number"
-                value={points}
-                onChange={(e) => setPoints(Number(e.target.value))}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={4}>
-            <Form.Group controlId="wd-group">
-              <Form.Label>Assignment Group</Form.Label>
-              <Form.Select defaultValue="ASSIGNMENTS">
-                <option>ASSIGNMENTS</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-
-          <Col md={4}>
-            <Form.Group controlId="wd-display-grade-as">
-              <Form.Label>Display Grade as</Form.Label>
-              <Form.Select defaultValue="Percentage">
-                <option>Percentage</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Form.Group className="mb-3" controlId="wd-submission-type">
-          <Form.Label>Submission Type</Form.Label>
-          <Form.Select defaultValue="Online">
-            <option>Online</option>
-          </Form.Select>
-          <Form.Text className="text-muted d-block mb-2">
-            Online Entry Options
-          </Form.Text>
-          <Form.Check type="checkbox" label="Text Entry" />
-          <Form.Check type="checkbox" label="Website URL" />
-          <Form.Check type="checkbox" label="Media Recordings" />
-          <Form.Check type="checkbox" label="Student Annotation" />
-          <Form.Check type="checkbox" label="File Uploads" />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="wd-assign-to">
-          <Form.Label>Assign To</Form.Label>
-          <Form.Control as="textarea" defaultValue="Everyone" />
-        </Form.Group>
-
-        <Row className="mb-3">
-          <Col md={4}>
-            <Form.Group controlId="wd-due-date">
-              <Form.Label>Due</Form.Label>
-              <Form.Control
-                type="datetime-local"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={4}>
-            <Form.Group controlId="wd-available-from">
-              <Form.Label>Available From</Form.Label>
-              <Form.Control
-                type="datetime-local"
-                value={availableFrom}
-                onChange={(e) => setAvailableFrom(e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={4}>
-            <Form.Group controlId="wd-available-until">
-              <Form.Label>Until</Form.Label>
-              <Form.Control
-                type="datetime-local"
-                value={availableUntil}
-                onChange={(e) => setAvailableUntil(e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <div className="d-flex justify-content-end gap-2">
-          <Button variant="secondary" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save
-          </Button>
+      <div className="row mb-3">
+        <div className="col-3 text-end">
+          <label htmlFor="wd-points" className="form-label">Points</label>
         </div>
-      </Form>
+        <div className="col-9">
+          <input id="wd-points" type="number" className="form-control" value={assignment.points} onChange={(e) => setAssignment({ ...assignment, points: parseInt(e.target.value) || 0 })} />
+        </div>
+      </div>
+
+      <div className="row mb-3">
+        <div className="col-3 text-end">
+          <label className="form-label">Assign</label>
+        </div>
+        <div className="col-9">
+          <div className="border rounded p-3">
+            <div className="mb-3">
+              <label htmlFor="wd-assign-to" className="form-label fw-bold">Assign to</label>
+              <input id="wd-assign-to" className="form-control" value="Everyone" disabled />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="wd-due-date" className="form-label fw-bold">Due</label>
+              <input id="wd-due-date" type="datetime-local" className="form-control" value={formatDateTimeForInput(assignment.dueDate)} onChange={(e) => setAssignment({ ...assignment, dueDate: e.target.value })} />
+            </div>
+
+            <div className="row">
+              <div className="col-6">
+                <label htmlFor="wd-available-from" className="form-label fw-bold">Available from</label>
+                <input id="wd-available-from" type="datetime-local" className="form-control" value={formatDateTimeForInput(assignment.availableDate)} onChange={(e) => setAssignment({ ...assignment, availableDate: e.target.value })} />
+              </div>
+              <div className="col-6">
+                <label htmlFor="wd-available-until" className="form-label fw-bold">Until</label>
+                <input id="wd-available-until" type="datetime-local" className="form-control" value={formatDateTimeForInput(assignment.availableUntil)} onChange={(e) => setAssignment({ ...assignment, availableUntil: e.target.value })} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr className="my-4" />
+
+      <div className="d-flex justify-content-end">
+        <Button variant="secondary" className="me-2" onClick={handleCancel}>Cancel</Button>
+        <Button variant="danger" onClick={handleSave}>Save</Button>
+      </div>
     </div>
   );
 }
