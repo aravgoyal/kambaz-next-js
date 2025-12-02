@@ -13,8 +13,11 @@ export default function Signin() {
  const [credentials, setCredentials] = useState<any>({});
  const dispatch = useDispatch();
  const signin = async () => {
+    console.log("Signing in with credentials:", credentials);
     const user =  await client.signin(credentials);
+    console.log("Received user from signin:", user);
     if (!user) return;
+    console.log("Signed in user:", user);
     dispatch(setCurrentUser(user));
     redirect("/Dashboard");
   };
