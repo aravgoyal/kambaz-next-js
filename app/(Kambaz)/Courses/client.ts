@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosWithCredentials = axios.create({ withCredentials: true });
-const REMOTE_SERVER = process.env.NEXT_PUBLIC_REMOTE_SERVER || process.env.NEXT_PUBLIC_HTTP_SERVER;
+const REMOTE_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
 const COURSES_API = `${REMOTE_SERVER}/api/courses`;
 const USERS_API = `${REMOTE_SERVER}/api/users`;
 const ASSIGNMENTS_API = `${REMOTE_SERVER}/api/assignments`;
