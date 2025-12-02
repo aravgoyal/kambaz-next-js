@@ -5,6 +5,7 @@ import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 import PeopleDetails from "../Details";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function PeopleTable({ users = [], fetchUsers }: { users?: any[]; fetchUsers: () => void }) {
   const { cid } = useParams();
   const [showDetails, setShowDetails] = useState(false);
