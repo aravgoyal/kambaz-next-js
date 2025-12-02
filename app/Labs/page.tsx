@@ -26,11 +26,19 @@ export default function Labs() {
             Lab 4
           </Link>
         </li>
+        <li className="nav-item">
+          <Link href="/Labs/Lab5" id="wd-lab5-link" className="nav-link">
+            Lab 5
+          </Link>
+        </li>
       </ul>
 
       <h2>Arav Goyal</h2>
       <Link href="https://github.com/aravgoyal/kambaz-next-js" id="wd-github" className="btn btn-link">
         Repository
+      </Link>
+      <Link href="/Account/Signin" id="wd-signin" className="btn btn-primary ms-3">
+        Kambaz
       </Link>
     </div>
   );
