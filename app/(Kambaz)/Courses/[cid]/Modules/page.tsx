@@ -26,11 +26,11 @@ export default function Modules() {
   const onCreateModuleForCourse = async () => {
     if (!courseId) return;
     const newModule = { name: moduleName, course: courseId };
-    const module = await coursesClient.createModuleForCourse(
+    const module1 = await coursesClient.createModuleForCourse(
       courseId,
       newModule
     );
-    dispatch(setModules([...modules, module]));
+    dispatch(setModules([...modules, module1]));
     setModuleName("");
   };
 

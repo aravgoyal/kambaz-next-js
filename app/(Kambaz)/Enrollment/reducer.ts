@@ -18,11 +18,13 @@ const enrollmentsSlice = createSlice({
         user: userId,
         course: courseId,
       };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       state.enrollments = [...state.enrollments, newEnrollment] as any;
     },
     unenrollFromCourse: (state, action) => {
       const { userId, courseId } = action.payload;
       state.enrollments = state.enrollments.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (e: any) => !(e.user === userId && e.course === courseId)
       );
     },
