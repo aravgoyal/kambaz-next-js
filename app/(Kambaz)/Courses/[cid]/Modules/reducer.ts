@@ -20,6 +20,7 @@ const modulesSlice = createSlice({
         name: module.name,
         course: module.course,
       };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       state.modules = [...state.modules, newModule] as any;
     },
     deleteModule: (state, { payload: moduleId }) => {
